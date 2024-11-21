@@ -48,6 +48,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.main.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -57,7 +58,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ljcho/PycharmProjects/face_shape_detect",
+    "last_opened_file_path": "C:/Users/ljcho/Documents/GitHub/glass_feedback",
     "show.migrate.to.gradle.popup": "false"
   },
   "keyToStringList": {
