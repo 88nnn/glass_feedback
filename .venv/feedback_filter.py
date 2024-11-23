@@ -1,4 +1,6 @@
+import chromadb
 import colorsys
+
 
 # RGB를 HSV로 변환하는 함수
 def rgb_to_hsv(color):
@@ -54,22 +56,22 @@ def get_brand_price(brand):
     return brand_price.get(brand.lower(), 50000)  # 브랜드 가격이 없다면 기본값 50000 반환
 
 # 피드백 조건에 따른 필터 함수 정의
-def apply_filter(recommendations, feedback_type, feedback_value, reference_item):
-    filtered_recommendations = recommendations
+def apply_filter(self, glasses_data, feedback_type, feedback_value, reference_item):
+    filtered_feedback = glasses_data
 
     if feedback_type == "price":
         if feedback_value == "cheaper":
-            filtered_recommendations = [item for item in filtered_recommendations if item['price'] < reference_item['price']]
+            filtered_feedback = [item for item in filtered_feedback if item.price < reference_item['price']]
         elif feedback_value == "expensive":
-            filtered_recommendations = [item for item in filtered_recommendations if item['price'] > reference_item['price']]
+            filtered_feedback = [item for item in filtered_feedback if item.price > reference_item['price']]
 
     elif feedback_type == "brand":
             # 브랜드별 가격을 기준으로 필터링
         brand_avg_price = get_brand_price(reference_item['brand'])
         if feedback_value == "budget":
-            filtered_recommendations = [item for item in filtered_recommendations if get_brand_price(item['brand']) < brand_avg_price]
+            filtered_feedback = [item for item in filtered_feedback if get_brand_price(item.brand) < brand_avg_price]
         elif feedback_value == "luxury":
-            filtered_recommendations = [item for item in filtered_recommendations if get_brand_price(item['brand']) > brand_avg_price]
+            filtered_feedback = [item for item in filtered_feedback if get_brand_price(item.brand) > brand_avg_price]
     
     # Shape 필터링 (각각의 shape군으로 필터링)
     elif feedback_type == "shape":
@@ -78,47 +80,39 @@ def apply_filter(recommendations, feedback_type, feedback_value, reference_item)
             "big lens": ["cats", "boeing"],   # 알이 큰 형태
             "round": ["boeing", "orval", "cats", "round"], #둥근 형태
             "frameless": ["frameless"],     # 테가 없는 형태
-            # 추가적인 형태 분류
+            # 뿔테, 굵은 테, 반무테 등 추가 필요
+            # 형태 분류 추가 가능
         }
         valid_shapes = shape_categories.get(feedback_value, [])
-        filtered_recommendations = [item for item in filtered_recommendations if item['shape'] in valid_shapes]
+        filtered_feedback = [item for item in filtered_feedback if item.shape in valid_shapes]
 
 
     elif feedback_type == "material":
         if feedback_value in ["metal", "plastic", "titan"]:
-            filtered_recommendations = [item for item in filtered_recommendations if item['material'] == feedback_value]
+            filtered_feedback = [item for item in filtered_feedback if item.material == feedback_value]
     
     # 색상 필터링 (HSV 값으로 필터링)
     elif feedback_type == "color":
-        reference_hsv = rgb_to_hsv(reference_item['color'])
+        reference_hsv = rgb_to_hsv(reference_item.color)
         adjusted_hsv = {
             "more_red": (10, 0, 0),    # 빨간 색상 증가
             "darker": (0, 0, -20),     # 더 어두운 색상
             "more_transparent": (0, 0, 255),  # 투명도 증가
             # 기타 컬러 변화 추가
-            # 원래는 피드백이 특정 색이나 밝음, 어두움, 더 따뜻한 색 등을 요구하면
-            # GPT API를 써 해당 요구에 맞춘 필터링("feedback_color":(n, n, n)과 같은 형식)을 반환하도록 구현하려 했으나
-            # 추후 키워드 검색 방식으로 바꿨기에, 일단 키워드로 제공할 테이블 작성 중이었음. 보완 필요.
         }
         hsv_adjustment = adjusted_hsv.get(feedback_value, (0, 0, 0))
-        filtered_recommendations = filter_by_hsv(filtered_recommendations, reference_hsv, hsv_adjustment)
+        filtered_feedback = filter_by_hsv(filtered_feedback, reference_hsv, hsv_adjustment)
 
-    elif feedback_type == "width":
-        if feedback_value == "narrower":
-            filtered_recommendations = [item for item in filtered_recommendations if item['width'] < reference_item['width']]
-        elif feedback_value == "wider":
-            filtered_recommendations = [item for item in filtered_recommendations if item['width'] > reference_item['width']]
-
-    elif feedback_type == "length":
-        if feedback_value == "shorter":
-            filtered_recommendations = [item for item in filtered_recommendations if item['length'] < reference_item['length']]
-        elif feedback_value == "longer":
-            filtered_recommendations = [item for item in filtered_recommendations if item['length'] > reference_item['length']]
+    elif feedback_type == "size":
+        if feedback_value == "bigger":
+            filtered_feedback = [item for item in filtered_feedback if item.size > reference_item['size']]
+        elif feedback_value == "smaller":
+            filtered_feedback = [item for item in filtered_feedback if item.size < reference_item['size']]
 
     elif feedback_type == "weight":
         if feedback_value == "lighter":
-            filtered_recommendations = [item for item in filtered_recommendations if item['weight'] < reference_item['weight']]
+            filtered_feedback = [item for item in filtered_feedback if item.weight < reference_item['weight']]
         elif feedback_value == "heavier":
-            filtered_recommendations = [item for item in filtered_recommendations if item['weight'] > reference_item['weight']]
+            filtered_feedback = [item for item in filtered_feedback if item.weight > reference_item['weight']]
 
-    return filtered_recommendations
+    return filtered_feedback

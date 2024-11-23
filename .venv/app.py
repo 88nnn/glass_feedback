@@ -1,7 +1,41 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
+from feedback_analysis import FeedbackAnalysis
+from chromadb_search import ChromaDBSearch
+
 
 app = Flask(__name__)
 
+
+def process_feedback():
+    try:
+        #data = request.json
+        #feedback_text = data['feedback']
+        #reference_item = data['reference_item']
+        def __init__(self):
+            self.client = chromadb.Client()
+            self.collection = self.client.get_or_create_collection("eyewear_collection")
+
+        def calculate_average(self, glasses_data, attribute):
+            values = [getattr(glass, attribute, None) for glass in glasses_data if getattr(glass, attribute, None)]
+            return sum(values) / len(values) if values else None
+
+        # 피드백 분석
+        feedback_analysis = feedback_input()
+        feedback_type, feedback_value = feedback_analysis.analyze(feedback_text)
+
+        # ChromaDB 검색
+        chroma_search = ChromaDBSearch()
+        filtered_items = chroma_search.search(feedback_type, feedback_value, reference_item)
+
+        # 결과 반환
+        return jsonify(filtered_items), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
+"""
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
     recommendations = [
@@ -23,6 +57,4 @@ def get_recommendations():
         # 추가 아이템들
     ]
     return jsonify(recommendations)
-
-if __name__ == "app":
-    app.run(port=5000)
+"""

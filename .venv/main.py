@@ -51,7 +51,12 @@ def display_keywords():
     print("키워드를 선택하세요:")
     print("1. 가격 (비싸다/저렴하다)")
     print("2. 색상 (밝다/어둡다)")
-    print("3. 너비 (넓다/좁다)")
+    print("3. 크기 (크다/작다)")
+    print("3. 모양 (각진/알이 큰/둥근/무테)") #뿔테, 굵은 테, 반무테 등 추가 필요
+    print("4. 브랜드 (비싸다/저렴하다)")
+    print("5. 재질 (금속/플라스틱/티타늄)")
+    print("6. 무게 (무겁다/가볍다)")
+
 
 def get_user_choice():
     """
@@ -62,16 +67,16 @@ def get_user_choice():
         choice = int(input("선택한 키워드 번호를 입력하세요: "))
         if choice == 1:
             feedback_type = "price"
-            feedback_value = input("가격 조건을 입력하세요 (비싸다/저렴하다): ")
+            feedback_value = input("가격 조건을 입력하세요 (1비싸다/2저렴하다): ")
         elif choice == 2:
             feedback_type = "color"
-            feedback_value = input("색상 조건을 입력하세요 (밝다/어둡다): ")
+            feedback_value = input("색상 조건을 입력하세요 (1밝다/2어둡다): ")
         elif choice == 3:
-            feedback_type = "width"
-            feedback_value = input("너비 조건을 입력하세요 (넓다/좁다): ")
+            feedback_type = "size"
+            feedback_value = input("크기 조건을 입력하세요 (1크다/2작다): ")
         else:
             print("잘못된 선택입니다.")
-            return get_user_choice()  # 재귀적으로 선택 다시 받기
+            return get_user_choice()
 
         return feedback_type, feedback_value
     except ValueError:
