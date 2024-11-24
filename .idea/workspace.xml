@@ -48,7 +48,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.main.executor": "Debug",
+    "Python.main.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -58,7 +58,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ljcho/PycharmProjects/glass_feedback",
+    "last_opened_file_path": "C:/Users/ljcho/Documents/GitHub/face_shape_connect",
     "show.migrate.to.gradle.popup": "false"
   },
   "keyToStringList": {
@@ -69,6 +69,11 @@
     ]
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ljcho\PycharmProjects\glass_feedback\.venv\feedback_input" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

@@ -50,10 +50,36 @@ def filter_by_hsv(recommendations, reference_hsv, feedback_hsv):
 
 def get_brand_price(brand):
     brand_price = {
-        "DAON": 80000, "PROJEKT PRODUKT": 301300, "Ash Compact": 102000,
-        #그 밖에 각 브랜드별 가격정보(브랜드별 아이템 가격 총합/브랜드별 아이템수)를 데이터베이스로부터 불러와서 평균가를 정의.
+    "Daon": 105000.0,
+    "Projekt produkt": 268500.0,
+    "Montblanc": 615000.0,
+    "Bibiem": 127500.0,
+    "Laurence paul": 240000.0,
+    "Lash": 232500.0,
+    "금자안경": 552000.0,
+    "Ash compact": 106500.0,
+    "Yuihi toyama": 550000.0,
+    "Blue elephant": 138000.0,
+    "Eyevan": 520000.0,
+    "Mahrcato": 240000.0,
+    "Accrue": 240000.0,
+    "Tvr": 640000.0,
+    "Lunor": 770000.0,
+    "Kame mannen": 617000.0,
+    "Buddy optical": 540000.0,
+    "Gentle monster": 289000.0,
+    "Native sons": 561000.0,
+    "Heister": 175000.0,
+    "Rayban": 230000.0,
+    "Versace": 350000.0,
+    "Maska": 265000.0,
+    "Rawrow": 169000.0,
+    "Weareannu": 450000.0,
+    "Museum by beacon": 218000.0,
+    "Drain your pocket money": 450000.0,
+    "Fake me": 190000.0
     }
-    return brand_price.get(brand.lower(), 50000)  # 브랜드 가격이 없다면 기본값 50000 반환
+    return brand_price.get(brand.lower(), 300000)  # 브랜드 가격이 없다면 기본값 50000 반환
 
 # 피드백 조건에 따른 필터 함수 정의
 def apply_filter(self, glasses_data, feedback_type, feedback_value, reference_item):
@@ -98,6 +124,16 @@ def apply_filter(self, glasses_data, feedback_type, feedback_value, reference_it
             "more_red": (10, 0, 0),    # 빨간 색상 증가
             "darker": (0, 0, -20),     # 더 어두운 색상
             "more_transparent": (0, 0, 255),  # 투명도 증가
+            "black": (0, 0, 0),  # Black has minimal saturation and value.
+            "brown": (15, 80, 100),  # Brown has low saturation and medium brightness.
+            "transparent": None,  # Transparent doesn't have an HSV value.
+            "silver": (0, 0, 192),  # Silver is a light gray with little saturation.
+            "gold": (45, 255, 215),  # Gold has a hue around yellow-orange.
+            "navy": (210, 255, 50),  # Navy has a low brightness and strong blue hue.
+            "purple": (270, 255, 100),  # Purple has a high saturation and value.
+            "rosegold": (15, 50, 225),  # Rose gold is a mix of pink and gold.
+            "yellow": (60, 255, 255),  # Yellow is bright with full saturation.
+            "charcoal": (0, 0, 70)  # Charcoal is a very dark gray.
             # 기타 컬러 변화 추가
         }
         hsv_adjustment = adjusted_hsv.get(feedback_value, (0, 0, 0))

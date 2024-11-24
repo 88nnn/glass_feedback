@@ -3,16 +3,57 @@ import requests
 from feedback_filter import apply_filter
 from dotenv import load_dotenv
 import os
-
+from flask import Flask, request, jsonify
+from get_reference_item import get_glasses
+import logging
+# 로그 설정
+logging.basicConfig(level=logging.INFO)
 from openai.lib.azure import API_KEY_SENTINEL
 
 load_dotenv()
 API_KEY = os.getenv('API_KEY_SENTINEL')
 
+@app.route('/feedback', methods=['POST'])
+def receive_feedback():
+    data = request.get_json()
+
+    user_id = data.get('userId')
+    feedback = data.get('feedback')
+
+    if not user_id or not feedback:
+        return jsonify({"status": "error", "message": "userId와 feedback가 필요합니다."}), 400
+
+    # Step 1: Get feedback from GPT or manual input
+    feedback_type, feedback_value = feedback_analysis()
+
+    # 현재는 로그로 피드백을 남기고 있습니다.
+    logging.info(f"Received feedback for user {user_id}: {feedback}")
+
+    # 유저 데이터를 기반으로 안경 정보 가져오기
+    glasses_data = get_glasses(user_id)
+    if not glasses_data:
+        return jsonify({"status": "error", "message": "유저 데이터 또는 안경 정보를 찾을 수 없습니다."}), 404
+
+    # Step 3: Calculate reference item based on feedback
+    reference_item = calculate_reference_item(feedback_type, feedback_value, glasses_data)
+    if not reference_item:
+        return jsonify({"error": "Could not calculate reference item"}), 400
+
+
+    # Step 4: Filter glasses data based on feedback
+    filtered_glasses = apply_filter(glasses_data, feedback_type, feedback_value, reference_item)
+
+    # Step 5: Return filtered recommendations
+    return jsonify({"recommended_glasses": filtered_glasses})
+    # 여기서 피드백을 처리하는 로직을 추가합니다. 예를 들어, 피드백 저장 등
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+"""
 def fetch_glasses_data_from_server(user_id):
-    """
-    Spring 서버에서 유저 ID로 안경 데이터를 가져옵니다.
-    """
+    #Spring 서버에서 유저 ID로 안경 데이터를 가져옵니다.
     try:
         # Flask에서 Spring API 호출하여 유저 ID로 안경 데이터 조회
         response = requests.get(f"http://localhost:8080/find/{user_id}")
@@ -22,81 +63,7 @@ def fetch_glasses_data_from_server(user_id):
         print(f"Error fetching glasses data: {e}")
         return None
 
-def analyze_feedback(feedback_type, feedback_value):
-    """
-    선택된 키워드와 값에 맞는 추천 필터링 조건 추출
-    """
-    if feedback_type == "price":
-        return "price", feedback_value
-    if feedback_type == "color":
-        return "color", feedback_value
-    if feedback_type == "width":
-        return "width", feedback_value
-
-    return None, None
-
-def filter_recommendations(feedback_type, feedback_value, glasses_data):
-    recommendations = glasses_data
-
-    # 선택된 피드백을 기반으로 필터링 진행
-    if feedback_type:
-        recommendations = apply_filter(recommendations, feedback_type, feedback_value)
-
-    return recommendations[0] if recommendations else None
-
-def display_keywords():
-    """
-    사용자가 선택할 수 있는 키워드 목록을 표시
-    """
-    print("키워드를 선택하세요:")
-    print("1. 가격 (비싸다/저렴하다)")
-    print("2. 색상 (밝다/어둡다)")
-    print("3. 크기 (크다/작다)")
-    print("3. 모양 (각진/알이 큰/둥근/무테)") #뿔테, 굵은 테, 반무테 등 추가 필요
-    print("4. 브랜드 (비싸다/저렴하다)")
-    print("5. 재질 (금속/플라스틱/티타늄)")
-    print("6. 무게 (무겁다/가볍다)")
-
-
-def get_user_choice():
-    """
-    사용자로부터 선택을 받아옵니다.
-    """
-    display_keywords()
-    try:
-        choice = int(input("선택한 키워드 번호를 입력하세요: "))
-        if choice == 1:
-            feedback_type = "price"
-            feedback_value = input("가격 조건을 입력하세요 (1비싸다/2저렴하다): ")
-        elif choice == 2:
-            feedback_type = "color"
-            feedback_value = input("색상 조건을 입력하세요 (1밝다/2어둡다): ")
-        elif choice == 3:
-            feedback_type = "size"
-            feedback_value = input("크기 조건을 입력하세요 (1크다/2작다): ")
-        else:
-            print("잘못된 선택입니다.")
-            return get_user_choice()
-
-        return feedback_type, feedback_value
-    except ValueError:
-        print("숫자를 입력해 주세요.")
-        return get_user_choice()
-
-if __name__ == "__main__":
-    # 사용자로부터 키워드와 조건 선택
-    feedback_type, feedback_value = get_user_choice()
-
-    user_id = input("사용자 ID를 입력하세요: ")  # 사용자의 ID를 입력받고
-    glasses_data = fetch_glasses_data_from_server(user_id)
-
-    if glasses_data is None:
-        print("안경 데이터를 가져오는 데 실패했습니다.")
-    else:
-        # 추천 결과 필터링
-        best_recommendation = filter_recommendations(feedback_type, feedback_value, glasses_data)
-        print("추천 상품:", best_recommendation if best_recommendation else "추천이 없습니다.")
-
+"""
 """
 openai.api_key = API_KEY #오픈에이아이 에이피아이키
 

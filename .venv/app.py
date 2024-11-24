@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify
 from feedback_analysis import FeedbackAnalysis
 from chromadb_search import ChromaDBSearch
-
+from flask import Flask, request, jsonify
+from feedback_analysis import feedback_analysis
+from feedback_filter import apply_filter
+from get_reference_item import get_glasses, calculate_reference_item
 
 app = Flask(__name__)
 
-
+@app.route('/feedback', methods=['POST'])
 def process_feedback():
     try:
         #data = request.json
