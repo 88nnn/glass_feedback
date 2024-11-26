@@ -1,11 +1,10 @@
 # feedback_input/gpt_feedback_input.py
-import openai
+import openai, os
 from openai import OpenAI
 from sphinx.cmd.quickstart import nonempty
-client = OpenAI()
+client = openai.OpenAI()
 # OpenAI API 키 설정 (본인의 API 키를 여기에 넣으세요)
-#OpenAI.api_key = os.getenv('OPENAI_API_KEY')
-OpenAI.api_key = 
+OpenAI.api_key = os.getenv('OPENAI_API_KEY')
 
 def rgb_to_hsv(color):
     """
@@ -27,8 +26,8 @@ def feedback_type_request(feedback_text):
     7종의 type만 반환: price, color, size, shape, brand, material, weight.
     """
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
@@ -41,8 +40,6 @@ def feedback_type_request(feedback_text):
                 {"role": "user", "content": feedback_text},
             ],
         )
-
-        # Parse and return the categories
         categories = eval(response['choices'][0]['message']['content'])['categories']
         return categories
 
@@ -69,8 +66,8 @@ def value_request(feedback_type, feedback_text):
         return None
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
@@ -84,8 +81,8 @@ def value_request(feedback_type, feedback_text):
             ],
         )
 
-        # Parse and return the value
-        value = eval(response['choices'][0]['message']['content'])['value']
+        # 파싱 후 밸류 값 반환
+        value = (eval(response['choices'][0]['message']['content']))['value']
         return value
 
     except Exception as e:
@@ -94,11 +91,11 @@ def value_request(feedback_type, feedback_text):
 
 def gpt_feedback_input(feedback_text):
     """
-    Analyze feedback and return a list of (type, value) pairs.
+    피드백 분석 후 (type, value) 쌍으로 반환
     """
     results = []
     try:
-        # Classify feedback into applicable categories
+        # 피드백 분류
         feedback_types = feedback_type_request(feedback_text)
 
         if not feedback_types:

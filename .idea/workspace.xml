@@ -46,38 +46,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.app.executor": "Run",
-    "Python.chromaDB_feedback_search.executor": "Run",
-    "Python.feedback_analysis.executor": "Run",
-    "Python.feedback_filter.executor": "Run",
-    "Python.get_glasses.executor": "Run",
-    "Python.gpt_feedback_input.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.manual_feedback_input.executor": "Run",
-    "Python.process_feedback.executor": "Run",
-    "Python.process_reference.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ljcho/PycharmProjects/glass_feedback",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.chromaDB_feedback_search.executor&quot;: &quot;Run&quot;,
+    &quot;Python.feedback_analysis.executor&quot;: &quot;Run&quot;,
+    &quot;Python.feedback_filter.executor&quot;: &quot;Run&quot;,
+    &quot;Python.get_glasses.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gpt_feedback_input.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.manual_feedback_input.executor&quot;: &quot;Run&quot;,
+    &quot;Python.process_feedback.executor&quot;: &quot;Run&quot;,
+    &quot;Python.process_reference.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ljcho/PycharmProjects/glass_feedback&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   },
-  "keyToStringList": {
-    "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
-      "repository"
+  &quot;keyToStringList&quot;: {
+    &quot;GitStage.ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;module&quot;,
+      &quot;repository&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ljcho\PycharmProjects\glass_feedback\.venv" />
