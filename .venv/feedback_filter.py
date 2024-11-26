@@ -6,14 +6,27 @@ import colorsys
 def rgb_to_hsv(color):
     color_map = {
         "black": (0, 0, 0),
-        "dark_blue": (0, 0, 50),
-        "navy": (240, 100, 30),
-        "gray": (0, 0, 80),
-        "silver": (0, 0, 192),
-        "white": (0, 0, 255),
-        "pink": (300, 100, 200),
-        "transparent": (0, 0, 255),
-        "yellow": (60, 255, 190),
+    "dark_blue": (240, 100, 30),
+    "navy": (240, 100, 30),
+    "gray": (0, 0, 80),
+    "silver": (0, 0, 192),
+    "white": (0, 0, 255),
+    "pink": (300, 100, 200),
+    "transparent": (0, 0, 255),  # 투명도는 HSV로 직접 표현 불가
+    "yellow": (60, 255, 190),
+    "red": (0, 255, 255),
+    "green": (120, 255, 255),
+    "blue": (240, 255, 255),
+    "orange": (30, 255, 255),
+    "purple": (270, 255, 255),
+    "brown": (15, 80, 100),
+    "gold": (45, 255, 215),
+    "charcoal": (0, 0, 70),
+    "light_gray": (0, 0, 190),
+    "beige": (40, 50, 200),
+    "teal": (160, 255, 128),
+    "peach": (30, 150, 250),
+    "mint": (150, 255, 200),
     }
     rgb = color_map.get(color.lower(), (0, 0, 128))  # 기본값으로 중간 밝기 설정
     r, g, b = [x / 255.0 for x in rgb]

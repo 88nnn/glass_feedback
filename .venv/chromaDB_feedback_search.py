@@ -1,6 +1,5 @@
 import chromadb
 
-
 def search_glasses_by_feedback(feedback_type, feedback_value, eyewear_collection):
 
     def __init__(self):

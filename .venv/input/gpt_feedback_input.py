@@ -1,8 +1,9 @@
 # feedback_input/gpt_feedback_input.py
 import openai
+from sphinx.cmd.quickstart import nonempty
 
 # OpenAI API 키 설정 (본인의 API 키를 여기에 넣으세요)
-openai.api_key = 'YOUR_API_KEY'
+openai.api_key = ""
 
 def rgb_to_hsv(color):
     """
@@ -32,7 +33,7 @@ def feedback_type_request(feedback_text):
             messages=[
                 {
                     "role": "system",
-                    "content": "Please classify the following feedback into one of the following categories: price, color, size, shape, brand, material, weight."
+                    "content": "Classify the feedback into all applicable categories from the list: price, color, size, shape, brand, material, weight."
                 },
                 {
                     "role": "user",
@@ -41,12 +42,12 @@ def feedback_type_request(feedback_text):
             ]
         )
 
-        # GPT 응답을 받아서 분석 결과를 반환
-        feedback_type = response.choices[0].message['content'].strip().lower()
+        # GPT 응답을 받아 리스트로 변환
+        feedback_types = response.choices[0].message['content'].strip().lower()
+        feedback_types_list = [ft.strip() for ft in feedback_types.split(",")]
 
-        # 반환된 피드백 타입을 확인하고 출력
-        print(f"피드백의 유형은 '{feedback_type}' 입니다.")
-        return feedback_type
+        print(f"피드백의 유형들: {feedback_types_list}")
+        return feedback_types_list
 
     except Exception as e:
         print(f"Error during API request: {e}")
@@ -310,17 +311,50 @@ def gpt_feedback_input(feedback_text):
     사용자가 입력한 텍스트를 GPT API로 분석하여 피드백 유형(type)과 값(value)을 반환
     """
     #feedback_type = gpt_feedback_request(feedback_text)
+    results = []
 
     try:
         # GPT API로 피드백 유형을 요청
-        feedback_type = feedback_type_request(feedback_text)
+        feedback_types = feedback_type_request(feedback_text)
 
-        if feedback_type is None:
+        if not feedback_types:
             print("피드백 유형을 판별할 수 없습니다.")
-            return None, None
+            return None
 
-        print(f"피드백 유형: {feedback_type}")
+        print(f"피드백 유형: {feedback_types}")
+        for feedback_type in feedback_types:
+            feedback_value = None
+            if feedback_type == "price":
+                feedback_value = price_value_request(feedback_text)
+            elif feedback_type == "color":
+                feedback_value = color_value_request(feedback_text)
+            elif feedback_type == "size":
+                feedback_value = size_value_request(feedback_text)
+            elif feedback_type == "material":
+                feedback_value = material_value_request(feedback_text)
+            elif feedback_type == "shape":
+                feedback_value = shape_value_request(feedback_text)
+            elif feedback_type == "brand":
+                feedback_value = brand_value_request(feedback_text)
+            elif feedback_type == "weight":
+                feedback_value = weight_value_request(feedback_text)
 
+            if feedback_value is not None:
+                results.append((feedback_type, feedback_value))
+        if not results:
+            print("유효한 피드백 값을 판별할 수 없습니다.")
+            return None
+    except Exception as e:
+        print(f"Error during feedback analysis: {e}")
+        return None
+
+    if results:
+        print(f"추출된 gpt 피드백: {results}")
+    else:
+        print("피드백 분석 실패.")
+
+
+"""
         # 만약 피드백 유형이 'price'라면 가격 조건을 물어보는 추가 작업 수행
         if feedback_type == "price":
             feedback_value = price_value_request(feedback_text)
@@ -350,12 +384,9 @@ def gpt_feedback_input(feedback_text):
         elif feedback_type == "weight":
             feedback_value = weight_value_request(feedback_text)  # 무게 관련 조건을 처리하는 함수 (예시)
             return feedback_type, feedback_value
-
-        # 다른 타입에 대해서 추가적인 요청이 필요한 경우 여기에 추가...
+            # 다른 타입에 대해서 추가적인 요청이 필요한 경우 여기에 추가...
         else:
             print(f"{feedback_type}에 대한 조건을 물어보는 기능이 구현되지 않았습니다.")
             return feedback_type, None
 
-    except Exception as e:
-        print(f"Error during feedback analysis: {e}")
-        return None, None
+        """

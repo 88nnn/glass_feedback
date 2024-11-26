@@ -4,7 +4,9 @@ from feedback_filter import apply_filter
 from dotenv import load_dotenv
 import os
 from flask import Flask, request, jsonify
-from get_reference_item import get_glasses
+from get_glasses import get_glasses
+from process_feedback import process_feedback
+from process_reference import calculate_option_and_reference
 import logging
 # 로그 설정
 logging.basicConfig(level=logging.INFO)
@@ -13,42 +15,47 @@ from openai.lib.azure import API_KEY_SENTINEL
 load_dotenv()
 API_KEY = os.getenv('API_KEY_SENTINEL')
 
-@app.route('/feedback', methods=['POST'])
-def receive_feedback():
-    data = request.get_json()
 
-    user_id = data.get('userId')
-    feedback = data.get('feedback')
+app = Flask(__name__)
+@app.route('/feedback/save', methods=['POST'])
+@app.route('/glasses/find/<user_id>', methods=['POST'])
+def main():
+    try:
+        feedback_list, user_id = process_feedback()  # 1. 피드백 처리
+        print(feedback_list, user_id)
+        glasses_data = get_glasses(user_id)  # 2. 안경 데이터 조회
+        # get_glasses가 이미 jsonify를 사용하여 응답을 반환하는데, 이를 받아서 데이터만 추출합니다.
+        glasses_data_json = glasses_data.get_json()  # Flask response 객체에서 데이터 추출
 
-    if not user_id or not feedback:
-        return jsonify({"status": "error", "message": "userId와 feedback가 필요합니다."}), 400
-
-    # Step 1: Get feedback from GPT or manual input
-    feedback_type, feedback_value = feedback_analysis()
-
-    # 현재는 로그로 피드백을 남기고 있습니다.
-    logging.info(f"Received feedback for user {user_id}: {feedback}")
-
-    # 유저 데이터를 기반으로 안경 정보 가져오기
-    glasses_data = get_glasses(user_id)
-    if not glasses_data:
-        return jsonify({"status": "error", "message": "유저 데이터 또는 안경 정보를 찾을 수 없습니다."}), 404
-
-    # Step 3: Calculate reference item based on feedback
-    reference_item = calculate_reference_item(feedback_type, feedback_value, glasses_data)
-    if not reference_item:
-        return jsonify({"error": "Could not calculate reference item"}), 400
+        option_item = calculate_option_and_reference(glasses_data_json)  # 3. 기준 데이터 생성
+        final_recommendations = DB_search(glasses_data, option_item)  # 4. DB 검색 및 필터링
 
 
-    # Step 4: Filter glasses data based on feedback
-    filtered_glasses = apply_filter(glasses_data, feedback_type, feedback_value, reference_item)
 
-    # Step 5: Return filtered recommendations
-    return jsonify({"recommended_glasses": filtered_glasses})
-    # 여기서 피드백을 처리하는 로직을 추가합니다. 예를 들어, 피드백 저장 등
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+"""
+# 필터링 함수 예시
+def apply_filter(feedback_list, glasses_data):
+    filtered = []
+    for glasses in glasses_data:
+        match = True
+        for feedback in feedback_list:
+            if feedback["feedback_type"] == "shape" and feedback["feedback_value"] != glasses["shape"]:
+                match = False
+            elif feedback["feedback_type"] == "color" and feedback["feedback_value"] != glasses["color"]:
+                match = False
+            # 추가 조건 작성 가능
+        if match:
+            filtered.append(glasses)
+    return filtered
+"""
+
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True, port=5000)
 
 
 """

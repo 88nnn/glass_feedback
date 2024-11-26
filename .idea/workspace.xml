@@ -48,7 +48,16 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.app.executor": "Run",
+    "Python.chromaDB_feedback_search.executor": "Run",
+    "Python.feedback_analysis.executor": "Run",
+    "Python.feedback_filter.executor": "Run",
+    "Python.get_glasses.executor": "Run",
+    "Python.gpt_feedback_input.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.manual_feedback_input.executor": "Run",
+    "Python.process_feedback.executor": "Run",
+    "Python.process_reference.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -58,7 +67,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ljcho/Documents/GitHub/face_shape_connect",
+    "last_opened_file_path": "C:/Users/ljcho/PycharmProjects/glass_feedback",
     "show.migrate.to.gradle.popup": "false"
   },
   "keyToStringList": {
@@ -71,6 +80,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ljcho\PycharmProjects\glass_feedback\.venv" />
+      <recent name="C:\Users\ljcho\PycharmProjects\glass_feedback" />
       <recent name="C:\Users\ljcho\PycharmProjects\glass_feedback\.venv\feedback_input" />
     </key>
   </component>
