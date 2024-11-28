@@ -5,7 +5,7 @@ import os
 from grpc import services
 sys.path.append(os.path.join(os.path.dirname(__file__), 'input'))
 from input.feedback_analysis import feedback_analysis
-from feedback_filter import apply_filter
+#from feedback_filter import apply_filter
 #from services.process_reference import calculate_option_and_reference
 
 app = Flask(__name__)
@@ -43,6 +43,9 @@ def process_feedback():
     except Exception as e:
         print(f"Error in process_feedback: {e}")
         return jsonify({'error': str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
 
 """
 # 유저의 안경 데이터를 조회하는 라우트
@@ -128,5 +131,4 @@ def get_glasses(user_id):
             # 추가 데이터...
         ]
 """
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+

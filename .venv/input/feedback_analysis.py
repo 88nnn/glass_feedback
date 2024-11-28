@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'input'))
 
 from gpt_feedback_input import gpt_feedback_input
 from manual_feedback_input import manual_feedback_input
-from statsmodels.graphics.tukeyplot import results
+#from statsmodels.graphics.tukeyplot import results
 
 
 def feedback_analysis(feedback_text):
@@ -40,7 +40,7 @@ def feedback_analysis(feedback_text):
 
 # 테스트 실행
 if __name__ == "__main__":
-    feedback_text = "명품 다각형 밝은 색 무게감 있는 느낌"  # 피드백 텍스트 예시
+    feedback_text = "저가 노란 색 무게감 있는 느낌"  # 피드백 텍스트 예시
     feedback_results = feedback_analysis(feedback_text)
     if feedback_results:
         print(f"선택된 피드백: {feedback_results}")

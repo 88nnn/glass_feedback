@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 #import chromadb_search
 import requests
-from process_feedback import process_feedback
+#from process_feedback import process_feedback
 #from feedback_filter import apply_filter
 #glasses_routes = Blueprint('glasses_routes', __name__)
 #sys.path.append(os.path.join(os.path.dirname(__file__), 'input'))
@@ -61,6 +61,7 @@ def get_glasses(user_id):
 
     try:
         response = requests.get(url)
+        response.raise_for_status()  # HTTP 오류가 발생하면 예외를 발생시킴
         if response.status_code == 200:
             glasses_data = response.json()  # JSON 형태로 반환된 안경 데이터
             if glasses_data is not None:
@@ -77,6 +78,7 @@ def get_glasses(user_id):
         return get_demo_data()  # 예외 발생 시 데모 데이터를 반환
 
 if __name__ == "__main__":
+    user_id = 1
     app.run(debug=True, port=5000)
 
 

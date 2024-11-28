@@ -7,7 +7,6 @@ def preprocess_text(text):
     """
     text = text.lower()  # 소문자로 변환
     text = re.sub(r'[^\w\s]', '', text)  # 특수문자 제거
-    text = text.replace(" ", "")  # 띄어쓰기 제거
     words = text.split()
     text = " ".join([word for word in words])
     return text
@@ -52,7 +51,6 @@ def fuzzy_match(text, keyword_map):
             all_keywords.extend(keywords)
     matches = get_close_matches(text, all_keywords, n=1, cutoff=0.7)
     return matches if matches else None
-
 
 def manual_feedback_input(feedback_text):
     """
@@ -166,30 +164,25 @@ def manual_feedback_input(feedback_text):
     results = search_trie(trie, feedback_text)
 
     # 유사도 기반 매칭 보완
-    matches = fuzzy_match(feedback_text, keyword_map)
-    if matches:
-        results = []
-        for match in matches:
-            for feedback_type, options in keyword_map.items():
-                for feedback_value, keywords in options.items():
-                    if match in keywords:
-                        results.append((feedback_type, feedback_value))
+    if not results:
+        fuzzy_matches = fuzzy_match(feedback_text, keyword_map)
+        if fuzzy_matches:
+            results = fuzzy_matches
 
     if results:
-        return results  # 다중 키워드 반환 가능
+        feedback_data = {'types': [], 'values': []}  # 결과 저장용 딕셔너리
+        for match in results:
+            feedback_type, feedback_value = match
+            # 다른 피드백 처리 (예: material, brand_price 등)
+            feedback_data['types'].append(feedback_type)
+            feedback_data['values'].append(str(feedback_value))  # 모든 피드백을 문자열로 처리
+        return feedback_data  # 다중 키워드 반환 가능
     else:
         print("일치하는 키워드를 찾을 수 없습니다. 다시 입력하세요.")
         return None
-
-"""
-    if not results:
-        match = fuzzy_match(feedback_text, keyword_map)
-        if match:
-            for feedback_type, options in keyword_map.items():
-                for feedback_value, keywords in options.items():
-                    if match in keywords:
-                        results.append((feedback_type, feedback_value))
-    if results:
-        #print(f"추출된 키워드 피드백: {feedback_results}")
-        return results  # 다중 키워드 반환 가능
-"""
+# 테스트 실행
+if __name__ == "__main__":
+    feedback_text = "명품 다각형 밝은 색 무게감 있는 느낌"  # 피드백 텍스트 예시
+    feedback_results = manual_feedback_input(feedback_text)
+    if feedback_results:
+        print(f"선택된 피드백: {feedback_results}")

@@ -8,11 +8,11 @@ load_dotenv()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-
+"""
 def rgb_to_hsv(color):
-    """
-    RGB 색상을 HSV로 변환하는 함수
-    """
+    
+    # RGB 색상을 HSV로 변환하는 함수
+    
     # 색상 변환 예시 (자신의 변환 로직에 맞게 수정)
     r, g, b = color
     # RGB -> HSV 변환 (임시 예시)
@@ -22,11 +22,11 @@ def rgb_to_hsv(color):
     saturation = 0  # 채도 (임시 값)
     value = max_val  # 명도 (임시 값)
     return (hue, saturation, value)
-
+"""
 
 def feedback_type_request(feedback_text):
     """
-    7종의 type만 반환: price, color, size, shape, brand, material, weight.
+    7종의 type만 반환: price, color, size, shape, brand, brand_price, material, weight.
     """
     try:
         #response = json.loads(response.model_dump_json())
@@ -44,19 +44,21 @@ def feedback_type_request(feedback_text):
                 {"role": "user", "content": feedback_text},
             ],
         )
-        # 응답을 JSON으로 안전하게 파싱
-        content = response.choices[0].message.content
-        print(f"Raw Response: {content}")  # 디버깅용 출력
+        # 응답 확인
+        if not response or not response.choices:
+            print("API returned an empty or invalid response.")
+            return None
 
-        # JSON 응답 파싱
-        parsed_response = json.loads(content)
-        types = parsed_response['types']
-        return types
-        """
-        #categories = eval(response['choices'][0]['message']['content'])['categories']
-        categories = json.loads(response.choices[0].message.content)['categories']
-        return categories
-        """
+        # 응답을 JSON으로 안전하게 파싱
+        content = response.choices[0].message.content.strip()
+        print(f"Raw Response: {content}")  # 디버깅용 출력
+        if content.startswith("{") and content.endswith("}"):
+            parsed_response = json.loads(content)  # JSON 파싱
+            return parsed_response.get("types", [])
+        else:
+            print("Response is not a valid JSON format.")
+            return None
+
     except Exception as e:
         print(f"Error during API request: {e}")
         return None
@@ -67,7 +69,9 @@ def value_request(feedback_type, feedback_text):
     """
     options = {
         "price": ["cheaper", "expensive"],
-        "color": [],  # 색상은 별도로 처리 #"color": ["redder", "darker", "brighter", "more transparent"],
+        "color": [
+        "black", "brown", "transparent", "silver", "gold", "navy", "purple", "rosegold",
+        "yellow", "charcoal"],
         "size": ["bigger", "smaller"],
         "material": ["metal", "plastic", "titan"],
         "shape": ["square", "round", "frameless", "poly", "boeing", "cats", "orval"],
@@ -94,25 +98,40 @@ def value_request(feedback_type, feedback_text):
                     "content": (
                         f"You are a classifier for '{feedback_type}'. Based on the user's feedback, "
                         f"return some value from this list: {options[feedback_type]}. " #(as a tuple of (hue, saturation, value))
-                        f"If feedback mentions a color adjustment, return HSV adjustment as {{'h': +-0, 's': +-0, 'v': +-0}}. "
                         f"Else, return in JSON format like this: {{'value': 'cheaper'}}"
                     ),
                 },
                 {"role": "user", "content": feedback_text},
             ],
         )
-
+        # 응답 내용 확인
+        if not response or not response.choices:
+            print("API returned an empty or invalid response.")
+            return None
+        response_dict = response.model_dump()  # <--- convert to dictionary
+        content = response_dict['choices'][0]['message']['content']
         # 파싱 후 밸류 값 반환
-        content = response.choices[0].message.content
+        #content = response.choices[0].message.content
         print(f"Raw Response: {content}")
-            #(json.loads(response.choices[0].message.content))
-        #value = (eval(response['choices'][0]['message']['content']))['value']
-        # 색상 조정 HSV 지원
-        if feedback_type == "color" and "h" in response_data:
-            return response_data  # HSV 조정값 반환
-        parsed_response = json.loads(content)
-        value = parsed_response['value']
-        return value
+
+        try:
+            parsed_response = json.loads(content)
+            types = parsed_response.get('types', [])
+            return types
+        except json.JSONDecodeError:
+            print("Failed to parse response as JSON. Attempting to interpret as plain text.")
+            parsed_response = {"value": content}
+
+            # HSV 처리
+        if feedback_type == "color" and "h" in parsed_response:
+            return parsed_response  # HSV 값 반환
+
+        value = parsed_response.get("value")
+        if value:
+            return value
+        else:
+            print("Parsed response does not contain a 'value' key.")
+            return None
 
     except json.JSONDecodeError:
         print("Failed to parse JSON. Check API response format.")
@@ -153,6 +172,6 @@ def gpt_feedback_input(feedback_text):
 
 if __name__ == "__main__":
     print("피드백 유형 (price/color/size/material/shape/brand/weight):")
-    feedback_text = "무른 소재, 금자안경, 더 차가운 색" #input("피드백 입력: ")
+    feedback_text = "무른 소재, lash보다 더 비싼 브랜드, 더 차가운 색" #input("피드백 입력: ")
     print("피드백 입력: " + feedback_text)
     gpt_feedback_input(feedback_text)
