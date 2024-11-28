@@ -27,35 +27,6 @@ def rgb_to_hsv(color):
     rgb = color_map.get(color.lower(), (128, 128, 128))  # 기본값으로 중간 밝기 설정
     r, g, b = [x / 255.0 for x in rgb]
     return colorsys.rgb_to_hsv(r, g, b)
-"""
- HSV를 기반으로 색상 필터링
-def filter_by_hsv(recommendations, reference_hsv, feedback_hsv):
-    
-    #HSV 거리 기준 필터링
-    #reference_hsv: 기존 추천 상품의 HSV 값
-    #feedback_hsv: 사용자가 요구한 색상의 HSV 조정값 (튜플: (h, s, v))
-    
-    h_tolerance, s_tolerance, v_tolerance = feedback_hsv
-
-    def hsv_distance(hsv1, hsv2):
-        # 두 색상 간 HSV 거리 계산
-        h1, s1, v1 = hsv1
-        h2, s2, v2 = hsv2
-        h_dist = min(abs(h1 - h2), 360 - abs(h1 - h2))  # Hue는 360도 원형
-        s_dist = abs(s1 - s2)
-        v_dist = abs(v1 - v2)
-        return h_dist, s_dist, v_dist
-
-    filtered = []
-    for item in recommendations:
-        item_hsv = rgb_to_hsv(item['color'])
-        h_dist, s_dist, v_dist = hsv_distance(reference_hsv, item_hsv)
-
-        if h_dist <= h_tolerance and s_dist <= s_tolerance and v_dist <= v_tolerance:
-            filtered.append(item)
-
-    return filtered
-"""
 
 def build_hsv_expr(reference_hsv, adjustment):
     """
@@ -116,12 +87,11 @@ def get_brand_price(option_item, feedback_value):
 
 # 피드백 조건에 따른 필터 함수 정의
 def build_expr(feedback_list, option_item):
-    filtered_feedback = []
+    # filtered_feedback = []
     for feedback in feedback_list:
         feedback_type = feedback['feedback_type']
-        feedback_value = feedback['feedback_type']
+        feedback_value = feedback['feedback_value']
 
-    reference_item = option_item
     comparable_fields = ["price", "size", "weight"]  # 통합 가능한 필드 목록
     if feedback_type in comparable_fields:
         if feedback_value in ["cheaper", "smaller", "lighter"]:
