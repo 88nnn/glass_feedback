@@ -61,23 +61,20 @@ def get_glasses(user_id):
 
     try:
         response = requests.get(url)
-
         if response.status_code == 200:
             glasses_data = response.json()  # JSON 형태로 반환된 안경 데이터
-            if glasses_data:
-                print(glasses_data["data"])  # 받은 데이터 출력 (디버깅용)
-                return jsonify(glasses_data["data"])  # JSON 형식으로 반환
-                # return glasses_data["data"]  # JSON 형식으로 반환
+            if glasses_data is not None:
+                return glasses_data.get("data", [])  # JSON 데이터의 "data" 필드 반환
             else:
                 # 데이터가 없을 경우 데모 데이터를 반환
-                return jsonify(get_demo_data())
+                return get_demo_data()
                 # return glasses_data["data"]
         else:
             print(f"Error fetching glasses data: {response.status_code}")
-            return jsonify(get_demo_data())  # API 호출 실패 시 데모 데이터를 반환
+            return get_demo_data()  # API 호출 실패 시 데모 데이터를 반환
     except Exception as e:
         print(f"Error in get_glasses_by_user_id: {e}")
-        return jsonify(get_demo_data())  # 예외 발생 시 데모 데이터를 반환
+        return get_demo_data()  # 예외 발생 시 데모 데이터를 반환
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -2,19 +2,22 @@ import openai
 import requests
 from feedback_filter import apply_filter
 from dotenv import load_dotenv
-import os
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'services'))
 from flask import Flask, request, jsonify
 from get_glasses import get_glasses
 from process_feedback import process_feedback
-from process_reference import calculate_option_and_reference
+from services.process_reference import process_reference
+from services.feedback_filter import apply_filter
+from services.db_search import db_search
 import logging
+
+
 # 로그 설정
 logging.basicConfig(level=logging.INFO)
-from openai.lib.azure import API_KEY_SENTINEL
-
 load_dotenv()
-API_KEY = os.getenv('API_KEY_SENTINEL')
-
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = Flask(__name__)
 @app.route('/feedback/save', methods=['POST'])
@@ -24,14 +27,12 @@ def main():
         feedback_list, user_id = process_feedback()  # 1. 피드백 처리
         print(feedback_list, user_id)
         glasses_data = get_glasses(user_id)  # 2. 안경 데이터 조회
-        # get_glasses가 이미 jsonify를 사용하여 응답을 반환하는데, 이를 받아서 데이터만 추출합니다.
-        glasses_data_json = glasses_data.get_json()  # Flask response 객체에서 데이터 추출
-
-        option_item = calculate_option_and_reference(glasses_data_json)  # 3. 기준 데이터 생성
-        final_recommendations = DB_search(glasses_data, option_item)  # 4. DB 검색 및 필터링
-
-
-
+        if not glasses_data:
+            raise ValueError("No glasses data found.")
+        feedback_hsv = (30, 0.2, 0.2)  # 사용자 제공 HSV 기준
+        option_item = process_reference(feedback_list, glasses_data, feedback_hsv) # 3. 기준 데이터 생성
+        feedback_item = db_search(glasses_data, option_item, feedback_list)  # 4. DB 검색 및 필터링
+        return feedback_item
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

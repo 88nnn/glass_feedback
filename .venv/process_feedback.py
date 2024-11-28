@@ -2,13 +2,11 @@ from flask import Flask, request, jsonify
 import requests
 import sys
 import os
-
 from grpc import services
+sys.path.append(os.path.join(os.path.dirname(__file__), 'input'))
 from input.feedback_analysis import feedback_analysis
 from feedback_filter import apply_filter
 #from services.process_reference import calculate_option_and_reference
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'input'))
 
 app = Flask(__name__)
 
@@ -39,8 +37,9 @@ def process_feedback():
             feedback_type, feedback_value = feedback  # 각 결과에서 타입과 값을 분리
             feedback_list.append({"feedback_type": feedback_type, "feedback_value": feedback_value})
         print("완료")
+        jsonify(feedback_list), 200
         # 여러 개의 피드백 결과를 반환
-        return jsonify(feedback_list), 200
+        return feedback_list, user_id
     except Exception as e:
         print(f"Error in process_feedback: {e}")
         return jsonify({'error': str(e)}), 500

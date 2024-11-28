@@ -3,10 +3,12 @@ import statistics
 #from markdown_it.rules_block import reference
 import colorsys
 
+from debugpy.launcher.debuggee import process
+
 # RGB를 HSV로 변환하는 함수
 def rgb_to_hsv(color):
     color_map = {
-        "black": (0, 0, 0),
+    "black": (0, 0, 0),
     "dark_blue": (240, 100, 30),
     "navy": (240, 100, 30),
     "gray": (0, 0, 80),
@@ -21,13 +23,7 @@ def rgb_to_hsv(color):
     "orange": (30, 255, 255),
     "purple": (270, 255, 255),
     "brown": (15, 80, 100),
-    "gold": (45, 255, 215),
-    "charcoal": (0, 0, 70),
-    "light_gray": (0, 0, 190),
-    "beige": (40, 50, 200),
-    "teal": (160, 255, 128),
-    "peach": (30, 150, 250),
-    "mint": (150, 255, 200),
+    "gold": (45, 255, 215)
     }
     rgb = color_map.get(color.lower(), (128, 128, 128))  # 기본값: 중간 밝기 설정
     r, g, b = [x / 255.0 for x in rgb]
@@ -42,13 +38,14 @@ def filter_by_hsv(glasses_data, reference_hsv, feedback_hsv):
     """
     h_tolerance, s_tolerance, v_tolerance = feedback_hsv
 
-    def hsv_distance(hsv1, hsv2):
-        h1, s1, v1 = hsv1
-        h2, s2, v2 = hsv2
-        h_dist = min(abs(h1 - h2), 360 - abs(h1 - h2))  # Hue는 360도 원형
-        s_dist = abs(s1 - s2)
-        v_dist = abs(v1 - v2)
-        return h_dist, s_dist, v_dist
+    def build_hsv_expr(reference_hsv, adjustment):
+        #HSV 조건을 expr로 변환
+        h, s, v = reference_hsv
+        dh, ds, dv = adjustment
+        new_h = h + dh
+        new_s = s + ds
+        new_v = v + dv
+        return f"(hue == {new_h} and saturation == {new_s} and value == {new_v})"
 
     """
     filtered = []
@@ -62,8 +59,8 @@ def filter_by_hsv(glasses_data, reference_hsv, feedback_hsv):
 
     return [
         item for item in glasses_data
-        if all(d <= t for d, t in zip(hsv_distance(reference_hsv, rgb_to_hsv(item['color'])), feedback_hsv))
-        ]
+        if all(d <= t for d, t in zip(hsv_distance(reference_hsv, rgb_to_hsv(item["color"])), (h_tol, s_tol, v_tol)))
+    ]
 
 
 # 브랜드 가격 데이터
@@ -112,29 +109,34 @@ def calculate_brand_price(recommendations):
     else:
         return None, None
 
-def calculate_option_and_reference(feedback_list, glasses_data, feedback_hsv=None):
+def process_reference(feedback_list, glasses_data, feedback_hsv=None):
 
     #피드백 리스트를 처리하여 각 유형별 옵션과 기준 값을 계산합니다.
 
     results = []
     for feedback in feedback_list:
         feedback_type = feedback['feedback_type']
+        feedback_value = feedback.get('feedback_value', None)
         # 피드백에 맞는 데이터만 추출
         relevant_values = [glasses[feedback_type] for glasses in glasses_data if feedback_type in glasses]
         if not relevant_values:
-            results.append({"feedback_type": feedback_type, "option_item": None})
+            results.append({"feedback_type": feedback_type, "expr": None})
             continue
-        #option_item = None
+
+       expr = None
 
         # 데이터 필터링
         if feedback_type in ["price", "weight", "size"]:
+            #가격, 무게, 크기 피드백은 중 두 번째로 큰 것과 두 번째로 작은 값을 기준으로 검색
             sorted_values = sorted(relevant_values)
-            option_item = {"second_smallest": sorted_values[1], "second_largest": sorted_values[-2]} if len(
-                sorted_values) >= 2 else None
+            option_item = {"second_smallest": sorted_values[1], "second_largest": sorted_values[-2]} \
+                if len(sorted_values) >= 2 else relevant_values #추천된 안경이 1개일 땐 해당 안경의 값을 반횐
         elif feedback_type == "color" and feedback_hsv:
             reference_hsv = rgb_to_hsv(relevant_values[0])
             option_item = filter_by_hsv(glasses_data, reference_hsv, feedback_hsv)
         elif feedback_type == "brand":
+            option_item = None
+        elif feedback_type == "brand_price":
             cheapest_brand, most_expensive_brand = calculate_brand_price(glasses_data)
             option_item = {"cheapest_brand": cheapest_brand, "most_expensive_brand": most_expensive_brand}
         elif feedback_type in ["shape", "material"]:
@@ -144,8 +146,6 @@ def calculate_option_and_reference(feedback_list, glasses_data, feedback_hsv=Non
 
         results.append({"feedback_type": feedback_type, "option_item": option_item})
     return results
-
-    #return option_item, reference_item
 
 
 # 테스트 실행
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     glasses_data = get_glasses(user_id)
 
     if glasses_data:
-        results = calculate_option_and_reference(feedback_list, glasses_data, feedback_hsv=(30, 0.2, 0.2))
+        results = process_reference(feedback_list, glasses_data, feedback_hsv=(30, 0.2, 0.2))
         print("Feedback Processing Results:")
         for result in results:
             print(result)
